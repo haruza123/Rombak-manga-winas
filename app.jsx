@@ -9,7 +9,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accent": "ryou",
   "cornerStyle": "soft",
   "showOcDuo": true,
-  "guard": true
+  "guard": false
 }/*EDITMODE-END*/;
 
 function App() {
