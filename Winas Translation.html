@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winas Translation — Portfolio Penerjemah Manga</title>
+  <meta name="description" content="Portfolio penerjemah manga Johan Winas TL — katalog judul, pembaruan terbaru, dan informasi kolaborasi." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <link rel="stylesheet" href="reader.css" />
+  <link rel="stylesheet" href="overlays.css" />
+  <style>
+    html, body { background: #1a1712; }
+    #root:empty::after {
+      content: "Memuat…";
+      position: fixed; inset: 0; display: grid; place-items: center;
+      color: #888; font-family: 'Space Mono', monospace; letter-spacing: .2em;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+  <script src="data.js"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="sections-top.jsx"></script>
+  <script type="text/babel" src="sections-continue.jsx"></script>
+  <script type="text/babel" src="sections-bottom.jsx"></script>
+  <script type="text/babel" src="sections-reader.jsx"></script>
+  <script type="text/babel" src="sections-library.jsx"></script>
+  <script type="text/babel" src="sections-overlays.jsx"></script>
+  <script type="text/babel" src="sections-guard.jsx"></script>
+  <script type="text/babel" src="app.jsx"></script>
+</body>
+</html>

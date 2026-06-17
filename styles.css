@@ -1,0 +1,213 @@
+/* ============================================================
+   Winas Translation — redesign
+   Theme system: data-mode (dark|light) × data-accent (warm|cool|pastel|moon)
+   ============================================================ */
+
+:root {
+  --font-display: 'Mochiy Pop One', system-ui, sans-serif;
+  --font-body: 'Zen Kaku Gothic New', system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+
+  --maxw: 1240px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 34px;
+
+  --ease: cubic-bezier(.22,1,.36,.08);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+}
+
+/* ---------- base modes ---------- */
+/* Dark = Ryou Akatsune — cool, inky, slight blue */
+.app[data-mode="dark"] {
+  --bg:      oklch(0.17 0.014 258);
+  --bg-soft: oklch(0.21 0.016 258);
+  --card:    oklch(0.235 0.018 258);
+  --card-2:  oklch(0.285 0.02 258);
+  --line:    oklch(0.35 0.02 258);
+  --text:    oklch(0.965 0.006 258);
+  --text-2:  oklch(0.74 0.01 258);
+  --text-3:  oklch(0.58 0.012 258);
+  --shadow:  0 18px 50px -20px rgba(0,0,0,.7);
+  --halftone: oklch(1 0 0 / 0.05);
+  --glass: oklch(0.21 0.016 258 / 0.72);
+}
+/* Light = Himori Rinka — warm, airy, soft pink */
+.app[data-mode="light"] {
+  --bg:      oklch(0.985 0.01 24);
+  --bg-soft: oklch(0.965 0.014 24);
+  --card:    oklch(1 0 0);
+  --card-2:  oklch(0.975 0.012 24);
+  --line:    oklch(0.9 0.016 24);
+  --text:    oklch(0.26 0.04 18);
+  --text-2:  oklch(0.5 0.03 18);
+  --text-3:  oklch(0.64 0.025 18);
+  --shadow:  0 18px 44px -22px rgba(180,80,110,.26);
+  --halftone: oklch(0.4 0.06 20 / 0.05);
+  --glass: oklch(0.99 0.01 24 / 0.8);
+}
+
+/* ---------- accents ---------- */
+/* Himori Rinka — light, warm pink/coral (brand #ff7a89) */
+.app[data-accent="himori"] {
+  --accent:   #ff6f85;
+  --accent-2: #ff9d6b;
+  --accent-ink: #ffffff;
+  --glow: oklch(0.7 0.17 13 / 0.4);
+}
+/* Ryou Akatsune — dark, COOL blue/indigo (brand #2f73ff) */
+.app[data-accent="ryou"] {
+  --accent:   #4f8bff;
+  --accent-2: #8a7bff;
+  --accent-ink: #ffffff;
+  --glow: oklch(0.62 0.18 258 / 0.45);
+}
+.app[data-accent="warm"] {
+  --accent:   oklch(0.66 0.2 33);
+  --accent-2: oklch(0.76 0.16 62);
+  --accent-ink: oklch(0.99 0.02 60);
+  --glow: oklch(0.66 0.2 33 / 0.45);
+}
+.app[data-accent="cool"] {
+  --accent:   oklch(0.62 0.18 268);
+  --accent-2: oklch(0.68 0.16 308);
+  --accent-ink: oklch(0.99 0.02 280);
+  --glow: oklch(0.62 0.18 268 / 0.45);
+}
+.app[data-accent="pastel"] {
+  --accent:   oklch(0.74 0.13 18);
+  --accent-2: oklch(0.79 0.11 310);
+  --accent-ink: oklch(0.24 0.04 20);
+  --glow: oklch(0.74 0.13 18 / 0.4);
+}
+.app[data-accent="moon"] {
+  --accent:   oklch(0.7 0.13 252);
+  --accent-2: oklch(0.84 0.1 92);
+  --accent-ink: oklch(0.18 0.03 252);
+  --glow: oklch(0.7 0.13 252 / 0.45);
+}
+
+/* ============================================================ */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; }
+
+.app {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background .4s var(--ease-out), color .4s var(--ease-out);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+img { display: block; max-width: 100%; }
+
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+/* ---------- reusable bits ---------- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.eyebrow::before {
+  content: "";
+  width: 22px; height: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+.section { padding: 88px 0; position: relative; }
+.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 38px; flex-wrap: wrap; }
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 44px);
+  margin: 12px 0 0;
+  line-height: 1.05;
+  letter-spacing: -.01em;
+}
+.section-sub { color: var(--text-2); margin: 8px 0 0; max-width: 46ch; font-size: 15px; line-height: 1.6; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14.5px;
+  border: 1.5px solid transparent;
+  transition: transform .2s var(--ease-out), box-shadow .25s, background .25s, color .25s, border-color .25s;
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(1px) scale(.98); }
+.btn-primary {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: var(--accent-ink);
+  box-shadow: 0 10px 28px -10px var(--glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -10px var(--glow); }
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--text); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--card-2);
+  color: var(--text-2);
+  border: 1px solid var(--line);
+}
+
+/* ---------- placeholder image ---------- */
+.ph {
+  position: relative;
+  background:
+    repeating-linear-gradient(135deg,
+      transparent 0 9px,
+      var(--halftone) 9px 18px),
+    var(--bg-soft);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--text-3);
+}
+.ph-img { background: var(--bg-soft); }
+.ph-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+.ph-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: var(--glass);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--line);
+}
+
+/* halftone + speedline decorations */
+.halftone-bg {
+  background-image: radial-gradient(var(--halftone) 1.6px, transparent 1.7px);
+  background-size: 16px 16px;
+}
+
+.spin-slow { animation: spin 22s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .wrap { padding: 0 18px; }
+  .section { padding: 60px 0; }
+}

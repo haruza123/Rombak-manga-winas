@@ -1,0 +1,35 @@
+{
+  "name": "Winas Translation",
+  "short_name": "Winas TL",
+  "description": "Katalog manga terjemahan Johan Winas TL — baca online langsung di browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1a1712",
+  "theme_color": "#d83a3a",
+  "orientation": "portrait-primary",
+  "lang": "id",
+  "categories": ["entertainment", "books"],
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/ryou.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}
