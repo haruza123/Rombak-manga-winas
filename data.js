@@ -11,7 +11,7 @@
 //
 //   Sekarang masih kosong → frontend pakai data tertanam (tampil normal, tapi data statis).
 // ============================================================
-window.API_BASE = "https://manga-codex-api.vercel.app"; // DEV LOKAL — ganti ke URL Vercel asli setelah deploy
+window.API_BASE = "http://localhost:3000"; // DEV LOKAL — ganti ke URL Vercel asli setelah deploy http://localhost:3000
 // ============================================================
 window.WINAS_PROFILE = {
   "translator": {

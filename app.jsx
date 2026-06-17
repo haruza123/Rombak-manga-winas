@@ -1,5 +1,5 @@
 /* global React, ReactDOM, Navbar, Hero, Updates, ShortTL, Catalog, OCBranding, WorkWithMe, Footer,
-   MangaDetail, Reader, Guard, ContinueReading, Library, Greeting, AdPopup,
+   MangaDetail, Reader, Guard, ContinueReading, Library, Greeting, AdPopup, Chatbot,
    useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakToggle, TweakColor */
 const { useState: useSA, useEffect: useEA, useRef: useRA } = React;
 
@@ -9,7 +9,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accent": "ryou",
   "cornerStyle": "soft",
   "showOcDuo": true,
-  "guard": true
+  "guard": false
 }/*EDITMODE-END*/;
 
 function App() {
@@ -100,6 +100,7 @@ function App() {
       <Guard enabled={t.guard} character={character} />
       <Greeting character={character} />
       <AdPopup />
+      {window.Chatbot && <Chatbot character={character} manga={D.manga} />}
 
       <TweaksPanel>
         <TweakSection label="Tema & karakter" />

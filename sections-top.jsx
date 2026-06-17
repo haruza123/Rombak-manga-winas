@@ -171,6 +171,12 @@ function Updates({ updates, onOpen }) {
   const scroll = (dir) => {
     if (rail.current) rail.current.scrollBy({ left: dir * 320, behavior: "smooth" });
   };
+  const NavArrows = () => (
+    <>
+      <button className="icon-btn" onClick={() => scroll(-1)} aria-label="Sebelumnya"><Icon name="left" /></button>
+      <button className="icon-btn" onClick={() => scroll(1)} aria-label="Berikutnya"><Icon name="right" /></button>
+    </>
+  );
   return (
     <section id="updates" className="section">
       <div className="wrap">
@@ -180,9 +186,9 @@ function Updates({ updates, onOpen }) {
             <h2 className="section-title">Pembaruan terbaru</h2>
             <p className="section-sub">Rilis chapter & revisi paling baru. Geser untuk lihat lebih banyak.</p>
           </div>
-          <div className="rail-nav">
-            <button className="icon-btn" onClick={() => scroll(-1)} aria-label="Sebelumnya"><Icon name="left" /></button>
-            <button className="icon-btn" onClick={() => scroll(1)} aria-label="Berikutnya"><Icon name="right" /></button>
+          {/* Desktop only — hidden on mobile */}
+          <div className="rail-nav rail-nav-desktop">
+            <NavArrows />
           </div>
         </div>
 
@@ -205,6 +211,11 @@ function Updates({ updates, onOpen }) {
               </div>
             </article>
           ))}
+        </div>
+
+        {/* Mobile: arrows below the rail */}
+        <div className="rail-nav rail-nav-mobile">
+          <NavArrows />
         </div>
       </div>
     </section>

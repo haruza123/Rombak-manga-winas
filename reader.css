@@ -112,14 +112,40 @@
 .rd-counter { flex: 1; text-align: center; font-family: var(--font-mono); font-size: 12px; color: var(--text-2); }
 
 @media (max-width: 720px) {
-  .detail-grid { grid-template-columns: 1fr; gap: 24px; }
-  .detail-side { position: static; flex-direction: column; }
-  .detail-cover { max-width: 200px; }
+  /* Detail page */
+  .detail-grid { grid-template-columns: 1fr; gap: 20px; padding-bottom: 56px; }
+  .detail-side { position: static; flex-direction: row; align-items: flex-start; gap: 20px; }
+  .detail-cover { flex-shrink: 0; max-width: 150px; }
   .detail-main { padding-top: 0; }
+  .detail-title { font-size: clamp(24px, 7vw, 44px); }
+  .detail-syn { font-size: 14.5px; }
+  .detail-meta { gap: 10px; }
+  .detail-credits { gap: 20px; }
+  .ch-head { margin-top: 36px; }
+  .ch-row { padding: 11px 14px; }
   .ch-info b { white-space: normal; }
+  .ch-tools { flex-wrap: wrap; gap: 8px; }
+  .ch-search { width: 100%; }
+
+  /* Reader bar */
   .rd-title { text-align: left; }
   .ch-select { max-width: 110px; }
   .rd-bar-inner { gap: 10px; padding: 9px 12px; }
+
+  /* Related */
+  .related-grid, .rd-related .related-grid { grid-template-columns: repeat(2, 1fr); }
+  .related { margin-top: 28px; }
+}
+
+@media (max-width: 480px) {
+  /* Detail side: stack cover on top centered */
+  .detail-side { flex-direction: column; align-items: center; text-align: center; }
+  .detail-cover { max-width: 140px; width: 140px; }
+  .bookmark, .share-btn { width: 100%; }
+  .detail-main { text-align: left; }
+  .detail-title { font-size: clamp(22px, 8vw, 40px); }
+  .detail-syn { font-size: 14px; }
+  .detail-credits { gap: 16px; }
 }
 
 /* ---------------- SHARE BUTTON ---------------- */
@@ -139,9 +165,6 @@
 /* Related inside reader (rd-end area) */
 .rd-related { margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,.08); text-align: left; width: 100%; }
 .rd-related .related-grid { grid-template-columns: repeat(4, 1fr); }
-@media (max-width: 720px) {
-  .related-grid, .rd-related .related-grid { grid-template-columns: repeat(2, 1fr); }
-}
 
 /* ============================================================
    GUARD — in-character protection dialog

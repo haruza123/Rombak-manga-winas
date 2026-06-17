@@ -1,5 +1,5 @@
 /* global React, Icon, Ph, StatusBadge, relTime */
-const { useState: useS2, useMemo: useM2 } = React;
+const { useState: useS2, useMemo: useM2, useEffect: useE2 } = React;
 
 /* ============================== CATALOG ============================== */
 function MangaCard({ m, onOpen }) {
@@ -44,6 +44,14 @@ function Catalog({ manga, query, onOpen }) {
   const [shown, setShown] = useS2(8);
   const [genre, setGenre] = useS2("Semua");
   const [series, setSeries] = useS2("Semua");
+  const [filterOpen, setFilterOpen] = useS2(false);
+
+  // Lock body scroll when filter sheet open on mobile
+  useE2(() => {
+    if (filterOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [filterOpen]);
 
   const genres = useM2(() => {
     const s = new Set();
@@ -73,6 +81,45 @@ function Catalog({ manga, query, onOpen }) {
   }, [manga, query, sort, genre, series]);
 
   const sorts = [["recent", "Terbaru"], ["az", "A–Z"], ["za", "Z–A"], ["oldest", "Terlama"]];
+  const activeFilters = (series !== "Semua" ? 1 : 0) + (genre !== "Semua" ? 1 : 0) + (query ? 1 : 0);
+  const clearFilter = () => { setSeries("Semua"); setGenre("Semua"); setShown(8); };
+
+  const FilterContent = () => (
+    <>
+      <div className="filterbar-row">
+        <span className="filter-label"><Icon name="book" size={13} /> Seri</span>
+        <div className="filter-pills">
+          {seriesList.map(s => {
+            const count = s === "Semua" ? manga.length : manga.filter(m => m.series === s).length;
+            return (
+              <button key={s} className="fpill fpill-series" data-on={series === s}
+                      onClick={() => { setSeries(s); setShown(8); }}>
+                {s}<span className="fpill-count">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="filterbar-divider" />
+      <div className="filterbar-row">
+        <span className="filter-label"><Icon name="spark" size={13} /> Genre</span>
+        <div className="filter-pills">
+          {genres.map(g => (
+            <button key={g} className="fpill" data-on={genre === g}
+                    onClick={() => { setGenre(g); setShown(8); }}>{g}</button>
+          ))}
+        </div>
+      </div>
+      <div className="filterbar-foot">
+        <span className="filter-count">{filtered.length} judul ditemukan</span>
+        {(series !== "Semua" || genre !== "Semua" || query) && (
+          <button className="filter-clear" onClick={clearFilter}>
+            <Icon name="close" size={13} /> Reset filter
+          </button>
+        )}
+      </div>
+    </>
+  );
 
   return (
     <section id="catalog" className="section">
@@ -83,43 +130,48 @@ function Catalog({ manga, query, onOpen }) {
             <h2 className="section-title">Katalog Manga</h2>
             <p className="section-sub">Daftar lengkap seri yang sedang & sudah diterjemahkan.</p>
           </div>
-          <div className="sort-pills">
-            {sorts.map(([k, t]) => (
-              <button key={k} className="sort-pill" data-on={sort === k} onClick={() => setSort(k)}>{t}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="filterbar">
-          <div className="filterbar-row">
-            <span className="filter-label"><Icon name="book" size={13} /> Seri</span>
-            <div className="filter-pills">
-              {seriesList.map(s => {
-                const count = s === "Semua" ? manga.length : manga.filter(m => m.series === s).length;
-                return (
-                  <button key={s} className="fpill fpill-series" data-on={series === s} onClick={() => { setSeries(s); setShown(8); }}>
-                    {s}<span className="fpill-count">{count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="filterbar-divider" />
-          <div className="filterbar-row">
-            <span className="filter-label"><Icon name="spark" size={13} /> Genre</span>
-            <div className="filter-pills">
-              {genres.map(g => (
-                <button key={g} className="fpill" data-on={genre === g} onClick={() => { setGenre(g); setShown(8); }}>{g}</button>
+          <div className="catalog-tools">
+            {/* Filter button — mobile only */}
+            <button className="btn-filter-toggle" onClick={() => setFilterOpen(o => !o)}>
+              <Icon name="spark" size={14} />
+              Filter
+              {activeFilters > 0 && <span className="filter-active-badge">{activeFilters}</span>}
+            </button>
+            <div className="sort-pills">
+              {sorts.map(([k, t]) => (
+                <button key={k} className="sort-pill" data-on={sort === k} onClick={() => setSort(k)}>{t}</button>
               ))}
             </div>
           </div>
-          <div className="filterbar-foot">
-            <span className="filter-count">{filtered.length} judul ditemukan</span>
-            {(series !== "Semua" || genre !== "Semua" || query) && (
-              <button className="filter-clear" onClick={() => { setSeries("Semua"); setGenre("Semua"); setShown(8); }}>
-                <Icon name="close" size={13} /> Reset filter
-              </button>
-            )}
+        </div>
+
+        {/* Desktop: inline filterbar */}
+        <div className="filterbar filterbar-desktop">
+          <FilterContent />
+        </div>
+
+        {/* Mobile: filter sheet backdrop */}
+        {filterOpen && (
+          <div className="filter-sheet-backdrop" onClick={() => setFilterOpen(false)} />
+        )}
+
+        {/* Mobile: filter bottom sheet */}
+        <div className={"filter-sheet" + (filterOpen ? " open" : "")}>
+          <div className="filter-sheet-handle" />
+          <div className="filter-sheet-head">
+            <span className="filter-sheet-title">Filter Manga</span>
+            <button className="filter-sheet-close" onClick={() => setFilterOpen(false)}>
+              <Icon name="close" size={16} />
+            </button>
+          </div>
+          <div className="filter-sheet-body">
+            <FilterContent />
+          </div>
+          <div className="filter-sheet-foot">
+            <button className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}
+                    onClick={() => setFilterOpen(false)}>
+              Terapkan ({filtered.length} judul)
+            </button>
           </div>
         </div>
 
