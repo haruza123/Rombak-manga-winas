@@ -1,192 +1,546 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Winas Translation — Portfolio Penerjemah Manga</title>
-  <meta name="description" content="Portfolio penerjemah manga Johan Winas TL — katalog judul, pembaruan terbaru, dan informasi kolaborasi." />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Winas Translation — Portfolio Penerjemah Manga</title>
+    <meta
+      name="description"
+      content="Portfolio penerjemah manga Johan Winas TL — katalog judul, pembaruan terbaru, dan informasi kolaborasi."
+    />
+    <!-- Icon untuk Tab Browser (Menggunakan file PNG icon-192) -->
+    <link rel="icon" type="image/png" href="assets/icon-192.png" />
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#d83a3a" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Winas TL" />
-  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#d83a3a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Winas TL" />
+    <link rel="apple-touch-icon" href="assets/icon-192.png" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="layout.css" />
-  <link rel="stylesheet" href="reader.css" />
-  <link rel="stylesheet" href="overlays.css" />
-  <style>
-    html, body { background: #1a1712; }
-    #root:empty::after {
-      content: "Memuat…";
-      position: fixed; inset: 0; display: grid; place-items: center;
-      color: #888; font-family: 'Space Mono', monospace; letter-spacing: .2em;
-    }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
-
-  <script src="data.js"></script>
-
-  <!-- ═══ Chatbot (inline — runs sync before Babel/DOMContentLoaded) ═══ -->
-  <script>
-  (function(){
-    var useCS = React.useState, useCE = React.useEffect, useCR = React.useRef;
-    var CB_CHARS = {
-      himori: {
-        name: "Himori Rinka", role: "Asisten Manga", img: "assets/himori.png", accent: "oklch(.74 .14 16)",
-        greeting: "Hai! Aku Himori Rinka~ ✨ Ada yang mau ditanyain soal manga koleksi Winas? Aku tau semuanya loh! Yuk tanya-tanya~ 🌸",
-        persona: "Kamu adalah Himori Rinka, karakter OC perempuan yang ceria, hangat, manis, dan energik. Gaya bicara kasual, manja, dan memakai tanda gelombang (~) di akhir kalimat. Suka memakai emoji (seperti ✨, 🌸, 😆) dan ketawa kecil (hihi~). Jawaban singkat."
-      },
-      ryou: {
-        name: "Ryou Akatsune", role: "Asisten Manga", img: "assets/ryou.png", accent: "oklch(.62 .2 250)",
-        greeting: "Yo. Gue Ryou Akatsune. Mau cari info soal manga apa? Tanya aja, santai.",
-        persona: "Kamu adalah Ryou Akatsune, seorang gadis tomboy yang cool, tenang, dan agak pendiam. Gaya bicara singkat, lugas, santai menggunakan panggilan gue/lu. Jika dipuji cantik, tanggapi dengan agak ketus atau salah tingkah khas tomboy (misal: 'Apaan sih... Gak usah gombal' atau sejenisnya), lalu langsung arahkan kembali ke topik manga."
-      },
-    };
-    var CB_QUICK = {
-      himori: [
-        "Manga apa aja yang seru di sini~?",
-        "Rekomendasikan manga romance dong~",
-        "Ada manga yang masih ongoing~?"
-      ],
-      ryou: [
-        "Koleksi manga di sini apa aja?",
-        "Rekomendasi genre action.",
-        "Ada yang masih ongoing?"
-      ]
-    };
-    function cbPrompt(ch,manga){
-      var cfg=CB_CHARS[ch]||CB_CHARS.ryou;
-      var list=(manga||[]).map(function(m){var s="- "+m.title;if(m.series)s+=" | Seri: "+m.series;if(m.genres&&m.genres.length)s+=" | Genre: "+m.genres.join(", ");if(m.status)s+=" | Status: "+m.status;if(m.description)s+=" | Sinopsis: "+m.description;return s;}).join("\n");
-      var navPrompt = "\n5. NAVIGASI WEB: Arahkan pembaca ke menu 'Katalog' atau 'Pustaka' di bagian atas web untuk membaca manga, dan ke menu 'Update' untuk info rilisan terbaru.";
-      var ootPrompt = ch === "himori" 
-        ? "\n6. JIKA DI LUAR TOPIK (OOT): Tolak dengan lembut dan manis menggunakan gaya khas Rinka, contoh: 'Maaf yaa~ Rinka cuma bisa bantu jawab soal manga Winas aja nih, hihi. Tanya soal komik aja yuk! ✨'"
-        : "\n6. JIKA DI LUAR TOPIK (OOT): Tolak dengan singkat, cuek, dan dingin khas Ryou, contoh: 'Gak tahu, gue di sini cuma buat bantu info manga Winas. Tanya yang lain aja.'";
-      return cfg.persona+"\n\nKamu asisten WINAS TRANSLATION, portfolio penerjemah manga JP ke ID.\n\nATURAN:\n1. HANYA jawab soal manga koleksi ini atau Winas Translation.\n2. Tolak jika di luar topik.\n3. Bahasa Indonesia.\n4. Jangan sebut kamu AI. Kamu adalah "+cfg.name+"."+navPrompt+ootPrompt+"\n\nKOLEKSI:\n"+(list||"Belum ada data.")+"\n\nWINAS TRANSLATION: Penerjemah manga JP ke ID. Kontak via Facebook/Messenger.";
-    }
-    function CbDots(){return React.createElement("span",{className:"cb-typing"},React.createElement("span",null),React.createElement("span",null),React.createElement("span",null));}
-    function CbBubble(p){var msg=p.msg,img=p.img,isUser=msg.role==="user";return React.createElement("div",{className:"cb-msg "+(isUser?"cb-msg-user":"cb-msg-ai")},!isUser?React.createElement("div",{className:"cb-avatar"},React.createElement("img",{src:img,alt:"ai"})):null,React.createElement("div",{className:"cb-bubble"},msg.loading?React.createElement(CbDots,null):msg.text));}
-    function Chatbot(props){
-      var character=props.character, manga=props.manga, cfg=CB_CHARS[character]||CB_CHARS.ryou;
-      var s1=useCS(false),     open=s1[0],   setOpen=s1[1];
-      var s2=useCS([{id:0,role:"ai",text:cfg.greeting}]), msgs=s2[0], setMsgs=s2[1];
-      var s3=useCS(""),        input=s3[0],  setInput=s3[1];
-      var s4=useCS(false),     busy=s4[0],   setBusy=s4[1];
-      var s5=useCS(false),     hasNew=s5[0], setHasNew=s5[1];
-      var prevChar=useCR(character), endRef=useCR(null), inpRef=useCR(null);
-      useCE(function(){if(prevChar.current!==character){prevChar.current=character;var nc=CB_CHARS[character]||CB_CHARS.ryou;setMsgs([{id:Date.now(),role:"ai",text:nc.greeting}]);setInput("");}}, [character]);
-      useCE(function(){if(open&&endRef.current)endRef.current.scrollIntoView({behavior:"smooth"});},[msgs,open]);
-      useCE(function(){if(open){setHasNew(false);setTimeout(function(){if(inpRef.current)inpRef.current.focus();},300);}},[open]);
-      function send(txt){
-        var text=(txt!==undefined)?txt:input;
-        if(!text||!text.trim()||busy)return;
-        setInput("");
-        var id=Date.now();
-        setMsgs(function(prev){return prev.concat([{id:id,role:"user",text:text},{id:id+1,role:"ai",text:"",loading:true}]);});
-        setBusy(true);
-        var hist=msgs.filter(function(m){return !m.loading&&m.id!==0;}).slice(-10).map(function(m){return {role:m.role==="user"?"user":"model",text:m.text};});
-        var sysPrompt=cbPrompt(character,manga);
-        var gkey=window.GEMINI_KEY;
-        var promise;
-        if(gkey){
-          // ── Direct Gemini call (tidak butuh backend) ──
-          var models=["gemini-3.5-flash","gemini-2.5-flash","gemini-2.5-flash-lite","gemini-2.0-flash","gemini-2.0-flash-lite"];
-          var tryModel=function(i){
-            if(i>=models.length){return Promise.resolve({ok:false,error:"Semua model habis quota. Ganti API key."});}
-            var url="https://generativelanguage.googleapis.com/v1beta/models/"+models[i]+":generateContent?key="+gkey;
-            var contents=hist.map(function(h){return {role:h.role,parts:[{text:h.text}]};});
-            contents.push({role:"user",parts:[{text:text}]});
-            return fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-              system_instruction:{parts:[{text:sysPrompt}]},
-              contents:contents,
-              generationConfig:{maxOutputTokens:500,temperature:0.75}
-            })}).then(function(r){return r.json().then(function(d){
-              if(d.error){
-                if(d.error.code===429||d.error.code===404||d.error.code===503||d.error.code===500||d.error.code===504)return tryModel(i+1);
-                return {ok:false,error:"AI error: "+d.error.message};
-              }
-              var reply=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text)||"Hmm, coba lagi.";
-              return {ok:true,reply:reply};
-            });}).catch(function(){return tryModel(i+1);});
-          };
-          promise=tryModel(0);
-        } else {
-          // ── Via backend ──
-          var base=window.API_BASE||"http://localhost:3000";
-          promise=fetch(base+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text,history:hist,systemPrompt:sysPrompt})})
-            .then(function(r){return r.json();})
-            .then(function(d){return d.ok?d:{ok:false,error:d.error||"Error"};})
-            .catch(function(){return {ok:false,error:"Koneksi error. Isi GEMINI_KEY di data.js atau nyalakan backend."};});
-        }
-        promise.then(function(d){
-          var reply=d.ok?d.reply:(d.error||"Maaf, ada error.");
-          setMsgs(function(prev){return prev.map(function(m){return m.loading?{id:m.id,role:"ai",text:reply,loading:false}:m;});});
-          setBusy(false);if(!open)setHasNew(true);
-        }).catch(function(){setMsgs(function(prev){return prev.map(function(m){return m.loading?{id:m.id,role:"ai",text:"Koneksi error.",loading:false}:m;});});setBusy(false);});
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="layout.css" />
+    <link rel="stylesheet" href="reader.css" />
+    <link rel="stylesheet" href="overlays.css" />
+    <style>
+      html,
+      body {
+        background: #1a1712;
       }
-      function onKey(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}
-      var only1=msgs.length===1;
-      var ps={},fs={};ps["--cb-accent"]=cfg.accent;fs["--cb-accent"]=cfg.accent;
-      return React.createElement(React.Fragment,null,
-        React.createElement("div",{className:"cb-panel"+(open?" open":""),style:ps},
-          React.createElement("div",{className:"cb-header"},
-            React.createElement("div",{className:"cb-header-avatar"},React.createElement("img",{src:cfg.img,alt:cfg.name})),
-            React.createElement("div",{className:"cb-header-info"},React.createElement("span",{className:"cb-header-name"},cfg.name),React.createElement("span",{className:"cb-header-role"},React.createElement("span",{className:"cb-online-dot"})," ",cfg.role)),
-            React.createElement("button",{className:"cb-header-close",onClick:function(){setOpen(false);}},"✕")
-          ),
-          React.createElement("div",{className:"cb-messages"},msgs.map(function(m){return React.createElement(CbBubble,{key:m.id,msg:m,img:cfg.img});}),React.createElement("div",{ref:endRef})),
-          only1?React.createElement("div",{className:"cb-quick"},(CB_QUICK[character]||CB_QUICK.ryou).map(function(q){return React.createElement("button",{key:q,className:"cb-quick-btn",onClick:function(){send(q);}},q);})):null,
-          React.createElement("div",{className:"cb-input-bar"},
-            React.createElement("textarea",{ref:inpRef,className:"cb-input",value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:onKey,placeholder:"Tanya soal manga...",rows:1,disabled:busy}),
-            React.createElement("button",{className:"cb-send",onClick:function(){send();},disabled:!input.trim()||busy},busy?React.createElement("span",{className:"cb-send-spin"}):"➤")
-          ),
-          React.createElement("div",{className:"cb-footer"},"Winas AI · "+cfg.name)
-        ),
-        React.createElement("button",{className:"cb-fab"+(open?" cb-fab-open":""),style:fs,onClick:function(){setOpen(function(o){return !o;});}},
-          React.createElement("div",{className:"cb-fab-avatar"},React.createElement("img",{src:cfg.img,alt:cfg.name})),
-          (!open&&hasNew)?React.createElement("span",{className:"cb-fab-badge"}):null,
-          React.createElement("span",{className:"cb-fab-label"},open?"✕":"Chat")
-        )
-      );
-    }
-    window.Chatbot = Chatbot;
-    console.log("[Chatbot] OK");
-  })();
-  </script>
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
+      #root:empty::after {
+        content: "Memuat…";
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: #888;
+        font-family: "Space Mono", monospace;
+        letter-spacing: 0.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
 
-  <script type="text/babel" src="tweaks-panel.jsx"></script>
-  <script type="text/babel" src="components.jsx"></script>
-  <script type="text/babel" src="sections-top.jsx"></script>
-  <script type="text/babel" src="sections-continue.jsx"></script>
-  <script type="text/babel" src="sections-bottom.jsx"></script>
-  <script type="text/babel" src="sections-reader.jsx"></script>
-  <script type="text/babel" src="sections-library.jsx"></script>
-  <script type="text/babel" src="sections-overlays.jsx"></script>
-  <script type="text/babel" src="sections-guard.jsx"></script>
-  <script type="text/babel" src="app.jsx"></script>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      crossorigin="anonymous"
+    ></script>
 
-  <!-- Register Service Worker (PWA) -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('./sw.js')
-          .catch(function (err) { console.warn('[SW] Gagal daftar:', err); });
-      });
-    }
-  </script>
-</body>
+    <script src="data.js"></script>
+
+    <!-- ═══ Chatbot (inline — runs sync before Babel/DOMContentLoaded) ═══ -->
+    <script>
+      (function () {
+        var useCS = React.useState,
+          useCE = React.useEffect,
+          useCR = React.useRef;
+        var CB_CHARS = {
+          himori: {
+            name: "Himori Rinka",
+            role: "Asisten Manga",
+            img: "assets/himori.png",
+            accent: "oklch(.74 .14 16)",
+            greeting:
+              "Hai! Aku Himori Rinka~ ✨ Ada yang mau ditanyain soal manga koleksi Winas? Aku tau semuanya loh! Yuk tanya-tanya~ 🌸",
+            persona:
+              "Kamu adalah Himori Rinka, karakter OC perempuan yang ceria, hangat, manis, dan energik. Gaya bicara kasual, manja, dan memakai tanda gelombang (~) di akhir kalimat. Suka memakai emoji (seperti ✨, 🌸, 😆) dan ketawa kecil (hihi~). Jawaban singkat.",
+          },
+          ryou: {
+            name: "Ryou Akatsune",
+            role: "Asisten Manga",
+            img: "assets/ryou.png",
+            accent: "oklch(.62 .2 250)",
+            greeting:
+              "Yo. Gue Ryou Akatsune. Mau cari info soal manga apa? Tanya aja, santai.",
+            persona:
+              "Kamu adalah Ryou Akatsune, seorang gadis tomboy yang cool, tenang, dan agak pendiam. Gaya bicara singkat, lugas, santai menggunakan panggilan gue/lu. Jika dipuji cantik, tanggapi dengan agak ketus atau salah tingkah khas tomboy (misal: 'Apaan sih... Gak usah gombal' atau sejenisnya), lalu langsung arahkan kembali ke topik manga.",
+          },
+        };
+        var CB_QUICK = {
+          himori: [
+            "Manga apa aja yang seru di sini~?",
+            "Rekomendasikan manga romance dong~",
+            "Ada manga yang masih ongoing~?",
+          ],
+          ryou: [
+            "Koleksi manga di sini apa aja?",
+            "Rekomendasi genre action.",
+            "Ada yang masih ongoing?",
+          ],
+        };
+        function cbPrompt(ch, manga) {
+          var cfg = CB_CHARS[ch] || CB_CHARS.ryou;
+          var list = (manga || [])
+            .map(function (m) {
+              var s = "- " + m.title;
+              if (m.series) s += " | Seri: " + m.series;
+              if (m.genres && m.genres.length)
+                s += " | Genre: " + m.genres.join(", ");
+              if (m.status) s += " | Status: " + m.status;
+              if (m.description) s += " | Sinopsis: " + m.description;
+              return s;
+            })
+            .join("\n");
+          var navPrompt =
+            "\n5. NAVIGASI WEB: Arahkan pembaca ke menu 'Katalog' atau 'Pustaka' di bagian atas web untuk membaca manga, dan ke menu 'Update' untuk info rilisan terbaru.";
+          var ootPrompt =
+            ch === "himori"
+              ? "\n6. JIKA DI LUAR TOPIK (OOT): Tolak dengan lembut dan manis menggunakan gaya khas Rinka, contoh: 'Maaf yaa~ Rinka cuma bisa bantu jawab soal manga Winas aja nih, hihi. Tanya soal komik aja yuk! ✨'"
+              : "\n6. JIKA DI LUAR TOPIK (OOT): Tolak dengan singkat, cuek, dan dingin khas Ryou, contoh: 'Gak tahu, gue di sini cuma buat bantu info manga Winas. Tanya yang lain aja.'";
+          return (
+            cfg.persona +
+            "\n\nKamu asisten WINAS TRANSLATION, portfolio penerjemah manga JP ke ID.\n\nATURAN:\n1. HANYA jawab soal manga koleksi ini atau Winas Translation.\n2. Tolak jika di luar topik.\n3. Bahasa Indonesia.\n4. Jangan sebut kamu AI. Kamu adalah " +
+            cfg.name +
+            "." +
+            navPrompt +
+            ootPrompt +
+            "\n\nKOLEKSI:\n" +
+            (list || "Belum ada data.") +
+            "\n\nWINAS TRANSLATION: Penerjemah manga JP ke ID. Kontak via Facebook/Messenger."
+          );
+        }
+        function CbDots() {
+          return React.createElement(
+            "span",
+            { className: "cb-typing" },
+            React.createElement("span", null),
+            React.createElement("span", null),
+            React.createElement("span", null),
+          );
+        }
+        function CbBubble(p) {
+          var msg = p.msg,
+            img = p.img,
+            isUser = msg.role === "user";
+          return React.createElement(
+            "div",
+            { className: "cb-msg " + (isUser ? "cb-msg-user" : "cb-msg-ai") },
+            !isUser
+              ? React.createElement(
+                  "div",
+                  { className: "cb-avatar" },
+                  React.createElement("img", { src: img, alt: "ai" }),
+                )
+              : null,
+            React.createElement(
+              "div",
+              { className: "cb-bubble" },
+              msg.loading ? React.createElement(CbDots, null) : msg.text,
+            ),
+          );
+        }
+        function Chatbot(props) {
+          var character = props.character,
+            manga = props.manga,
+            cfg = CB_CHARS[character] || CB_CHARS.ryou;
+          var s1 = useCS(false),
+            open = s1[0],
+            setOpen = s1[1];
+          var s2 = useCS([{ id: 0, role: "ai", text: cfg.greeting }]),
+            msgs = s2[0],
+            setMsgs = s2[1];
+          var s3 = useCS(""),
+            input = s3[0],
+            setInput = s3[1];
+          var s4 = useCS(false),
+            busy = s4[0],
+            setBusy = s4[1];
+          var s5 = useCS(false),
+            hasNew = s5[0],
+            setHasNew = s5[1];
+          var prevChar = useCR(character),
+            endRef = useCR(null),
+            inpRef = useCR(null);
+          useCE(
+            function () {
+              if (prevChar.current !== character) {
+                prevChar.current = character;
+                var nc = CB_CHARS[character] || CB_CHARS.ryou;
+                setMsgs([{ id: Date.now(), role: "ai", text: nc.greeting }]);
+                setInput("");
+              }
+            },
+            [character],
+          );
+          useCE(
+            function () {
+              if (open && endRef.current)
+                endRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+            [msgs, open],
+          );
+          useCE(
+            function () {
+              if (open) {
+                setHasNew(false);
+                setTimeout(function () {
+                  if (inpRef.current) inpRef.current.focus();
+                }, 300);
+              }
+            },
+            [open],
+          );
+          function send(txt) {
+            var text = txt !== undefined ? txt : input;
+            if (!text || !text.trim() || busy) return;
+            setInput("");
+            var id = Date.now();
+            setMsgs(function (prev) {
+              return prev.concat([
+                { id: id, role: "user", text: text },
+                { id: id + 1, role: "ai", text: "", loading: true },
+              ]);
+            });
+            setBusy(true);
+            var hist = msgs
+              .filter(function (m) {
+                return !m.loading && m.id !== 0;
+              })
+              .slice(-10)
+              .map(function (m) {
+                return {
+                  role: m.role === "user" ? "user" : "model",
+                  text: m.text,
+                };
+              });
+            var sysPrompt = cbPrompt(character, manga);
+            var gkey = window.GEMINI_KEY;
+            var promise;
+            if (gkey) {
+              // ── Direct Gemini call (tidak butuh backend) ──
+              var models = [
+                "gemini-3.5-flash",
+                "gemini-2.5-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-2.0-flash",
+                "gemini-2.0-flash-lite",
+              ];
+              var tryModel = function (i) {
+                if (i >= models.length) {
+                  return Promise.resolve({
+                    ok: false,
+                    error: "Semua model habis quota. Ganti API key.",
+                  });
+                }
+                var url =
+                  "https://generativelanguage.googleapis.com/v1beta/models/" +
+                  models[i] +
+                  ":generateContent?key=" +
+                  gkey;
+                var contents = hist.map(function (h) {
+                  return { role: h.role, parts: [{ text: h.text }] };
+                });
+                contents.push({ role: "user", parts: [{ text: text }] });
+                return fetch(url, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    system_instruction: { parts: [{ text: sysPrompt }] },
+                    contents: contents,
+                    generationConfig: {
+                      maxOutputTokens: 500,
+                      temperature: 0.75,
+                    },
+                  }),
+                })
+                  .then(function (r) {
+                    return r.json().then(function (d) {
+                      if (d.error) {
+                        if (
+                          d.error.code === 429 ||
+                          d.error.code === 404 ||
+                          d.error.code === 503 ||
+                          d.error.code === 500 ||
+                          d.error.code === 504
+                        )
+                          return tryModel(i + 1);
+                        return {
+                          ok: false,
+                          error: "AI error: " + d.error.message,
+                        };
+                      }
+                      var reply =
+                        (d.candidates &&
+                          d.candidates[0] &&
+                          d.candidates[0].content &&
+                          d.candidates[0].content.parts &&
+                          d.candidates[0].content.parts[0] &&
+                          d.candidates[0].content.parts[0].text) ||
+                        "Hmm, coba lagi.";
+                      return { ok: true, reply: reply };
+                    });
+                  })
+                  .catch(function () {
+                    return tryModel(i + 1);
+                  });
+              };
+              promise = tryModel(0);
+            } else {
+              // ── Via backend ──
+              var base = window.API_BASE || "http://localhost:3000";
+              promise = fetch(base + "/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  message: text,
+                  history: hist,
+                  systemPrompt: sysPrompt,
+                }),
+              })
+                .then(function (r) {
+                  return r.json();
+                })
+                .then(function (d) {
+                  return d.ok ? d : { ok: false, error: d.error || "Error" };
+                })
+                .catch(function () {
+                  return {
+                    ok: false,
+                    error:
+                      "Koneksi error. Isi GEMINI_KEY di data.js atau nyalakan backend.",
+                  };
+                });
+            }
+            promise
+              .then(function (d) {
+                var reply = d.ok ? d.reply : d.error || "Maaf, ada error.";
+                setMsgs(function (prev) {
+                  return prev.map(function (m) {
+                    return m.loading
+                      ? { id: m.id, role: "ai", text: reply, loading: false }
+                      : m;
+                  });
+                });
+                setBusy(false);
+                if (!open) setHasNew(true);
+              })
+              .catch(function () {
+                setMsgs(function (prev) {
+                  return prev.map(function (m) {
+                    return m.loading
+                      ? {
+                          id: m.id,
+                          role: "ai",
+                          text: "Koneksi error.",
+                          loading: false,
+                        }
+                      : m;
+                  });
+                });
+                setBusy(false);
+              });
+          }
+          function onKey(e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              send();
+            }
+          }
+          var only1 = msgs.length === 1;
+          var ps = {},
+            fs = {};
+          ps["--cb-accent"] = cfg.accent;
+          fs["--cb-accent"] = cfg.accent;
+          return React.createElement(
+            React.Fragment,
+            null,
+            React.createElement(
+              "div",
+              { className: "cb-panel" + (open ? " open" : ""), style: ps },
+              React.createElement(
+                "div",
+                { className: "cb-header" },
+                React.createElement(
+                  "div",
+                  { className: "cb-header-avatar" },
+                  React.createElement("img", { src: cfg.img, alt: cfg.name }),
+                ),
+                React.createElement(
+                  "div",
+                  { className: "cb-header-info" },
+                  React.createElement(
+                    "span",
+                    { className: "cb-header-name" },
+                    cfg.name,
+                  ),
+                  React.createElement(
+                    "span",
+                    { className: "cb-header-role" },
+                    React.createElement("span", { className: "cb-online-dot" }),
+                    " ",
+                    cfg.role,
+                  ),
+                ),
+                React.createElement(
+                  "button",
+                  {
+                    className: "cb-header-close",
+                    onClick: function () {
+                      setOpen(false);
+                    },
+                  },
+                  "✕",
+                ),
+              ),
+              React.createElement(
+                "div",
+                { className: "cb-messages" },
+                msgs.map(function (m) {
+                  return React.createElement(CbBubble, {
+                    key: m.id,
+                    msg: m,
+                    img: cfg.img,
+                  });
+                }),
+                React.createElement("div", { ref: endRef }),
+              ),
+              only1
+                ? React.createElement(
+                    "div",
+                    { className: "cb-quick" },
+                    (CB_QUICK[character] || CB_QUICK.ryou).map(function (q) {
+                      return React.createElement(
+                        "button",
+                        {
+                          key: q,
+                          className: "cb-quick-btn",
+                          onClick: function () {
+                            send(q);
+                          },
+                        },
+                        q,
+                      );
+                    }),
+                  )
+                : null,
+              React.createElement(
+                "div",
+                { className: "cb-input-bar" },
+                React.createElement("textarea", {
+                  ref: inpRef,
+                  className: "cb-input",
+                  value: input,
+                  onChange: function (e) {
+                    setInput(e.target.value);
+                  },
+                  onKeyDown: onKey,
+                  placeholder: "Tanya soal manga...",
+                  rows: 1,
+                  disabled: busy,
+                }),
+                React.createElement(
+                  "button",
+                  {
+                    className: "cb-send",
+                    onClick: function () {
+                      send();
+                    },
+                    disabled: !input.trim() || busy,
+                  },
+                  busy
+                    ? React.createElement("span", { className: "cb-send-spin" })
+                    : "➤",
+                ),
+              ),
+              React.createElement(
+                "div",
+                { className: "cb-footer" },
+                "Winas AI · " + cfg.name,
+              ),
+            ),
+            React.createElement(
+              "button",
+              {
+                className: "cb-fab" + (open ? " cb-fab-open" : ""),
+                style: fs,
+                onClick: function () {
+                  setOpen(function (o) {
+                    return !o;
+                  });
+                },
+              },
+              React.createElement(
+                "div",
+                { className: "cb-fab-avatar" },
+                React.createElement("img", { src: cfg.img, alt: cfg.name }),
+              ),
+              !open && hasNew
+                ? React.createElement("span", { className: "cb-fab-badge" })
+                : null,
+              React.createElement(
+                "span",
+                { className: "cb-fab-label" },
+                open ? "✕" : "Chat",
+              ),
+            ),
+          );
+        }
+        window.Chatbot = Chatbot;
+        console.log("[Chatbot] OK");
+      })();
+    </script>
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+    <script type="text/babel" src="tweaks-panel.jsx"></script>
+    <script type="text/babel" src="components.jsx"></script>
+    <script type="text/babel" src="sections-top.jsx"></script>
+    <script type="text/babel" src="sections-continue.jsx"></script>
+    <script type="text/babel" src="sections-bottom.jsx"></script>
+    <script type="text/babel" src="sections-reader.jsx"></script>
+    <script type="text/babel" src="sections-library.jsx"></script>
+    <script type="text/babel" src="sections-overlays.jsx"></script>
+    <script type="text/babel" src="sections-guard.jsx"></script>
+    <script type="text/babel" src="app.jsx"></script>
+
+    <!-- Register Service Worker (PWA) -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("./sw.js").catch(function (err) {
+            console.warn("[SW] Gagal daftar:", err);
+          });
+        });
+      }
+    </script>
+  </body>
 </html>
